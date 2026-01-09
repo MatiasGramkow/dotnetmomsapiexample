@@ -101,9 +101,8 @@ namespace UFSTWSSecuritySample
                     Console.WriteLine("Signature verified: " + isOk);
 
                     Console.WriteLine(isOk);
-                    // Now check that we trust the certificate 
-                    var certPem = File.ReadAllText(Settings.PathPEM);
-                    var cert = X509Certificate2.CreateFromPem(certPem);
+                    // Now check that we trust the certificate
+                    var cert = LoadCertificateFromPem(Settings.PathPEM);
                     bool isTruested = cert.Equals(x509Certificate2);
                     Console.WriteLine("Certificate trusted: " + isTruested);
                     return XElement.Parse(responseEnvelope);
@@ -273,6 +272,22 @@ namespace UFSTWSSecuritySample
             }
 
             return envelope;
+        }
+
+        private X509Certificate2 LoadCertificateFromPem(string pemPath)
+        {
+            var pemContent = File.ReadAllText(pemPath);
+
+            // Remove PEM headers/footers and whitespace
+            var base64 = pemContent
+                .Replace("-----BEGIN CERTIFICATE-----", "")
+                .Replace("-----END CERTIFICATE-----", "")
+                .Replace("\r", "")
+                .Replace("\n", "")
+                .Trim();
+
+            var certBytes = Convert.FromBase64String(base64);
+            return new X509Certificate2(certBytes);
         }
 
         private class SignedXmlWithId : SignedXml
