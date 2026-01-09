@@ -5,6 +5,6 @@ namespace UFSTWSSecuritySample
 {
     public interface IApiClient
     {
-        Task<XElement> CallService(IPayloadWriter payloadWriter, string endpoint);
+        Task<XElement> CallService(IPayloadWriter payloadWriter, string endpoint, string soapAction = null);
     }
 }

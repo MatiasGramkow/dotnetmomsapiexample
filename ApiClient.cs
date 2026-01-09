@@ -43,7 +43,7 @@ namespace UFSTWSSecuritySample
 
         }
 
-        public async Task<XElement> CallService(IPayloadWriter payloadWriter, String endpoint)
+        public async Task<XElement> CallService(IPayloadWriter payloadWriter, String endpoint, string soapAction = null)
         {
             var uri = new Uri(endpoint);
 
@@ -60,6 +60,10 @@ namespace UFSTWSSecuritySample
             using (var request = new HttpRequestMessage(HttpMethod.Post, uri))
             {
                 request.Content = new StringContent(envelope, Encoding.UTF8, "text/xml");
+                if (!string.IsNullOrEmpty(soapAction))
+                {
+                    request.Headers.Add("SOAPAction", $"\"{soapAction}\"");
+                }
 
                 using (var response = client.SendAsync(request).Result)
                 {
@@ -112,13 +116,13 @@ namespace UFSTWSSecuritySample
             string envelope = null;
 
             var certificateId = string.Format("X509-{0}", Guid.NewGuid().ToString());
-            var bodyId = "element-1-1272320911598-1522000";
+            var bodyId = $"id-{Guid.NewGuid()}";
 
             var dtNow = DateTime.UtcNow;
             var now = dtNow.ToString("o").Substring(0, 23) + "Z";
 
-            // Timestamp
-            var timestampExpires = dtNow.AddMinutes(50).ToString("o").Substring(0, 23) + "Z";
+            // Timestamp - 5 minutter gyldighed som Java-klienten
+            var timestampExpires = dtNow.AddMinutes(5).ToString("o").Substring(0, 23) + "Z";
             var timestampId = $"TS-{Guid.NewGuid()}";
 
             using (var stream = new MemoryStream())
@@ -193,16 +197,9 @@ namespace UFSTWSSecuritySample
                 signedXml.KeyInfo = keyInfo;
 
 
-                // Sign the wsse:BinarySecurityToken
-                var referencebst = new Reference();
-                referencebst.Uri = $"#{certificateId}";
-                var t3 = new XmlDsigExcC14NTransform();
-                referencebst.AddTransform(t3);
-                referencebst.DigestMethod = SignedXml.XmlDsigSHA1Url;
-                signedXml.AddReference(referencebst);
+                // Rækkefølge som Java-klienten: Timestamp -> Body -> BinarySecurityToken
 
-
-                // Sign the timestamp fragment
+                // 1. Sign the timestamp fragment
                 var reference0 = new Reference();
                 reference0.Uri = $"#{timestampId}";
                 var t0 = new XmlDsigExcC14NTransform();
@@ -210,13 +207,21 @@ namespace UFSTWSSecuritySample
                 reference0.DigestMethod = SignedXml.XmlDsigSHA1Url;
                 signedXml.AddReference(reference0);
 
-                // Sign the body
+                // 2. Sign the body
                 var reference1 = new Reference();
                 reference1.Uri = $"#{bodyId}";
                 var t1 = new XmlDsigExcC14NTransform();
                 reference1.AddTransform(t1);
                 reference1.DigestMethod = SignedXml.XmlDsigSHA1Url;
                 signedXml.AddReference(reference1);
+
+                // 3. Sign the wsse:BinarySecurityToken
+                var referencebst = new Reference();
+                referencebst.Uri = $"#{certificateId}";
+                var t3 = new XmlDsigExcC14NTransform();
+                referencebst.AddTransform(t3);
+                referencebst.DigestMethod = SignedXml.XmlDsigSHA1Url;
+                signedXml.AddReference(referencebst);
 
 
 
