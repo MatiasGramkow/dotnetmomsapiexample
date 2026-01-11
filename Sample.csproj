@@ -2,8 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net48</TargetFramework>
-    <LangVersion>7.3</LangVersion>
+    <TargetFramework>net8.0</TargetFramework>
     <UserSecretsId>61bda669-96aa-407f-8b62-c130da5d29ad</UserSecretsId>
   </PropertyGroup>
 
@@ -21,8 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="System.Security" />
-    <Reference Include="System.Net.Http" />
+    <PackageReference Include="System.Security.Cryptography.Xml" Version="8.0.0" />
   </ItemGroup>
 
   <ItemGroup>

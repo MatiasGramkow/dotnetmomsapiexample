@@ -48,20 +48,30 @@ namespace UFSTWSSecuritySample
             switch (command)
             {
                 case "VirksomhedKalenderHent":
-                    await client.CallService(new VirksomhedKalenderHentWriter("41250313", "2024-01-01", "2025-12-31"), endpoints.VirksomhedKalenderHent);
+                    await client.CallService(new VirksomhedKalenderHentWriter("41250313", "2025-01-01", "2026-12-31"), endpoints.VirksomhedKalenderHent);
                     Console.WriteLine("Finished");
                     break;
                 case "ModtagMomsangivelseForeloebig":
-                    // Test momsangivelse for Q1 2024
+                    // Kræver TransaktionIdentifikator fra VirksomhedKalenderHent response
+                    if (args.Length < 2)
+                    {
+                        Console.WriteLine("Fejl: TransaktionIdentifikator mangler!");
+                        Console.WriteLine("Brug: dotnet run ModtagMomsangivelseForeloebig <transaktionId>");
+                        Console.WriteLine("Hent først transaktionId fra: dotnet run VirksomhedKalenderHent");
+                        break;
+                    }
+                    var kalenderTransaktionId = args[1];
+                    // Test momsangivelse for Q1 2026 (current quarter)
                     // afgiftTilsvar = salgsMoms - koebsMoms = 2000 - 500 = 1500
                     await client.CallService(new ModtagMomsangivelseForeloebigWriter(
+                        transaktionIdentifikator: kalenderTransaktionId,
                         seNummer: "41250313",
-                        periodeFraDato: "2024-01-01",
-                        periodeTilDato: "2024-03-31",
+                        periodeFraDato: "2026-01-01",
+                        periodeTilDato: "2026-03-31",
                         afgiftTilsvarBeloeb: 1500,
                         salgsMomsBeloeb: 2000,
                         koebsMomsBeloeb: 500
-                    ), endpoints.ModtagMomsangivelseForeloebig, "getModtagMomsangivelseForeloebig");
+                    ), endpoints.ModtagMomsangivelseForeloebig);
                     Console.WriteLine("Finished");
                     break;
                 case "MomsangivelseKvitteringHent":
@@ -76,7 +86,10 @@ namespace UFSTWSSecuritySample
                     break;
                 default:
                     Console.WriteLine("Invalid command");
-                    Console.WriteLine("dotnet run [VirksomhedKalenderHent|ModtagMomsangivelseForeloebig|MomsangivelseKvitteringHent <transaktionId>]");
+                    Console.WriteLine("Brug:");
+                    Console.WriteLine("  dotnet run VirksomhedKalenderHent");
+                    Console.WriteLine("  dotnet run ModtagMomsangivelseForeloebig <transaktionId fra VirksomhedKalenderHent>");
+                    Console.WriteLine("  dotnet run MomsangivelseKvitteringHent <transaktionId fra ModtagMomsangivelseForeloebig>");
                     break;
             }
         }

@@ -5,6 +5,7 @@ namespace UFSTWSSecuritySample
 {
     public class ModtagMomsangivelseForeloebigWriter : IPayloadWriter
     {
+        private readonly string transaktionIdentifikator; // Fra VirksomhedKalenderHent response
         private readonly string seNummer;
         private readonly string periodeFraDato;
         private readonly string periodeTilDato;
@@ -16,6 +17,7 @@ namespace UFSTWSSecuritySample
         private readonly long? eksportOmsaetningBeloeb;
 
         public ModtagMomsangivelseForeloebigWriter(
+            string transaktionIdentifikator, // Fra VirksomhedKalenderHent response
             string seNummer,
             string periodeFraDato,
             string periodeTilDato,
@@ -26,6 +28,7 @@ namespace UFSTWSSecuritySample
             long? euSalgVarerBeloeb = null,
             long? eksportOmsaetningBeloeb = null)
         {
+            this.transaktionIdentifikator = transaktionIdentifikator;
             this.seNummer = seNummer;
             this.periodeFraDato = periodeFraDato;
             this.periodeTilDato = periodeTilDato;
@@ -40,14 +43,13 @@ namespace UFSTWSSecuritySample
         public void Write(XmlTextWriter writer)
         {
             var now = DateTime.UtcNow.ToString("o").Substring(0, 23) + "Z";
-            var transactionId = Guid.NewGuid().ToString();
 
             writer.WriteStartElement("urn", "ModtagMomsangivelseForeloebig_I", "urn:oio:skat:nemvirksomhed:ws:1.0.0");
 
-            // HovedOplysninger
+            // HovedOplysninger - bruger TransaktionIdentifikator fra VirksomhedKalenderHent
             writer.WriteStartElement("ns", "HovedOplysninger", "http://rep.oio.dk/skat.dk/basis/kontekst/xml/schemas/2006/09/01/");
             writer.WriteStartElement("ns", "TransaktionIdentifikator", null);
-            writer.WriteString(transactionId);
+            writer.WriteString(transaktionIdentifikator);
             writer.WriteEndElement();
             writer.WriteStartElement("ns", "TransaktionTid", null);
             writer.WriteString(now);
