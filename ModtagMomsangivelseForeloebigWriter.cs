@@ -1,124 +1,83 @@
 using System;
+using System.Globalization;
 using System.Xml;
 
 namespace UFSTWSSecuritySample
 {
     public class ModtagMomsangivelseForeloebigWriter : IPayloadWriter
     {
-        private readonly string transaktionIdentifikator; // Fra VirksomhedKalenderHent response
         private readonly string seNummer;
         private readonly string periodeFraDato;
         private readonly string periodeTilDato;
         private readonly long afgiftTilsvarBeloeb;
         private readonly long? salgsMomsBeloeb;
         private readonly long? koebsMomsBeloeb;
-        private readonly long? euKoebBeloeb;
-        private readonly long? euSalgVarerBeloeb;
-        private readonly long? eksportOmsaetningBeloeb;
 
         public ModtagMomsangivelseForeloebigWriter(
-            string transaktionIdentifikator, // Fra VirksomhedKalenderHent response
             string seNummer,
             string periodeFraDato,
             string periodeTilDato,
             long afgiftTilsvarBeloeb,
             long? salgsMomsBeloeb = null,
-            long? koebsMomsBeloeb = null,
-            long? euKoebBeloeb = null,
-            long? euSalgVarerBeloeb = null,
-            long? eksportOmsaetningBeloeb = null)
+            long? koebsMomsBeloeb = null)
         {
-            this.transaktionIdentifikator = transaktionIdentifikator;
             this.seNummer = seNummer;
             this.periodeFraDato = periodeFraDato;
             this.periodeTilDato = periodeTilDato;
             this.afgiftTilsvarBeloeb = afgiftTilsvarBeloeb;
             this.salgsMomsBeloeb = salgsMomsBeloeb;
             this.koebsMomsBeloeb = koebsMomsBeloeb;
-            this.euKoebBeloeb = euKoebBeloeb;
-            this.euSalgVarerBeloeb = euSalgVarerBeloeb;
-            this.eksportOmsaetningBeloeb = eksportOmsaetningBeloeb;
         }
 
         public void Write(XmlTextWriter writer)
         {
-            var now = DateTime.UtcNow.ToString("o").Substring(0, 23) + "Z";
+            var now = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss.fff", CultureInfo.InvariantCulture) + DateTimeOffset.Now.ToString("zzz");
+            var transaktionId = Guid.NewGuid().ToString().ToUpper();
 
-            writer.WriteStartElement("urn", "ModtagMomsangivelseForeloebig_I", "urn:oio:skat:nemvirksomhed:ws:1.0.0");
+            // Namespace URIs - PRÆCIS som README eksemplet
+            const string nsUrn = "urn:oio:skat:nemvirksomhed:ws:1.0.0";
+            const string nsNs = "http://rep.oio.dk/skat.dk/basis/kontekst/xml/schemas/2006/09/01/";
+            const string nsNs1 = "http://rep.oio.dk/skat.dk/motor/class/virksomhed/xml/schemas/20080401/";
+            const string nsUrn1 = "urn:oio:skat:nemvirksomhed:1.0.0";
 
-            // HovedOplysninger - bruger TransaktionIdentifikator fra VirksomhedKalenderHent
-            writer.WriteStartElement("ns", "HovedOplysninger", "http://rep.oio.dk/skat.dk/basis/kontekst/xml/schemas/2006/09/01/");
-            writer.WriteStartElement("ns", "TransaktionIdentifikator", null);
-            writer.WriteString(transaktionIdentifikator);
-            writer.WriteEndElement();
-            writer.WriteStartElement("ns", "TransaktionTid", null);
-            writer.WriteString(now);
-            writer.WriteEndElement();
-            writer.WriteEndElement();
+            // Root element med urn: prefix (som README)
+            writer.WriteStartElement("urn", "ModtagMomsangivelseForeloebig_I", nsUrn);
+            writer.WriteAttributeString("xmlns", "urn", null, nsUrn);
+            writer.WriteAttributeString("xmlns", "ns", null, nsNs);
+            writer.WriteAttributeString("xmlns", "ns1", null, nsNs1);
+            writer.WriteAttributeString("xmlns", "urn1", null, nsUrn1);
 
-            // Angivelse
-            writer.WriteStartElement("urn", "Angivelse", null);
-
-            // AngiverVirksomhedSENummer (wrapper element)
-            writer.WriteStartElement("urn", "AngiverVirksomhedSENummer", null);
-            writer.WriteStartElement("ns1", "VirksomhedSENummerIdentifikator", "http://rep.oio.dk/skat.dk/motor/class/virksomhed/xml/schemas/20080401/");
-            writer.WriteString(seNummer);
-            writer.WriteEndElement();
+            // HovedOplysninger
+            writer.WriteStartElement("ns", "HovedOplysninger", nsNs);
+            writer.WriteElementString("ns", "TransaktionIdentifikator", nsNs, transaktionId);
+            writer.WriteElementString("ns", "TransaktionTid", nsNs, now);
             writer.WriteEndElement();
 
-            // Angivelsesoplysninger (wrapper for datoer)
-            writer.WriteStartElement("urn", "Angivelsesoplysninger", null);
-            writer.WriteStartElement("urn1", "AngivelsePeriodeFraDato", "urn:oio:skat:nemvirksomhed:1.0.0");
-            writer.WriteString(periodeFraDato);
-            writer.WriteEndElement();
-            writer.WriteStartElement("urn1", "AngivelsePeriodeTilDato", "urn:oio:skat:nemvirksomhed:1.0.0");
-            writer.WriteString(periodeTilDato);
-            writer.WriteEndElement();
+            // Angivelse med urn: prefix
+            writer.WriteStartElement("urn", "Angivelse", nsUrn);
+
+            // AngiverVirksomhedSENummer med urn: prefix
+            writer.WriteStartElement("urn", "AngiverVirksomhedSENummer", nsUrn);
+            writer.WriteElementString("ns1", "VirksomhedSENummerIdentifikator", nsNs1, seNummer);
             writer.WriteEndElement();
 
-            // Angivelsesafgifter
-            writer.WriteStartElement("urn", "Angivelsesafgifter", null);
-
-            // MomsAngivelseAfgiftTilsvarBeloeb (påkrævet)
-            writer.WriteStartElement("urn1", "MomsAngivelseAfgiftTilsvarBeloeb", "urn:oio:skat:nemvirksomhed:1.0.0");
-            writer.WriteString(afgiftTilsvarBeloeb.ToString());
+            // Angivelsesoplysninger med urn: prefix - datoer UDEN timezone
+            writer.WriteStartElement("urn", "Angivelsesoplysninger", nsUrn);
+            writer.WriteElementString("urn1", "AngivelsePeriodeFraDato", nsUrn1, periodeFraDato);
+            writer.WriteElementString("urn1", "AngivelsePeriodeTilDato", nsUrn1, periodeTilDato);
             writer.WriteEndElement();
 
-            // Valgfrie felter - i korrekt rækkefølge ifølge schema
+            // Angivelsesafgifter med urn: prefix - kun felter med værdier
+            writer.WriteStartElement("urn", "Angivelsesafgifter", nsUrn);
+
+            // AfgiftTilsvar (påkrævet)
+            writer.WriteElementString("urn1", "MomsAngivelseAfgiftTilsvarBeloeb", nsUrn1, afgiftTilsvarBeloeb.ToString());
+
+            // Valgfrie felter - kun inkluder hvis de har værdi
             if (koebsMomsBeloeb.HasValue)
-            {
-                writer.WriteStartElement("urn1", "MomsAngivelseKoebsMomsBeloeb", "urn:oio:skat:nemvirksomhed:1.0.0");
-                writer.WriteString(koebsMomsBeloeb.Value.ToString());
-                writer.WriteEndElement();
-            }
-
+                writer.WriteElementString("urn1", "MomsAngivelseKoebsMomsBeloeb", nsUrn1, koebsMomsBeloeb.Value.ToString());
             if (salgsMomsBeloeb.HasValue)
-            {
-                writer.WriteStartElement("urn1", "MomsAngivelseSalgsMomsBeloeb", "urn:oio:skat:nemvirksomhed:1.0.0");
-                writer.WriteString(salgsMomsBeloeb.Value.ToString());
-                writer.WriteEndElement();
-            }
-
-            if (euKoebBeloeb.HasValue)
-            {
-                writer.WriteStartElement("urn1", "MomsAngivelseEUKoebBeloeb", "urn:oio:skat:nemvirksomhed:1.0.0");
-                writer.WriteString(euKoebBeloeb.Value.ToString());
-                writer.WriteEndElement();
-            }
-
-            if (euSalgVarerBeloeb.HasValue)
-            {
-                writer.WriteStartElement("urn1", "MomsAngivelseEUSalgBeloebVarerBeloeb", "urn:oio:skat:nemvirksomhed:1.0.0");
-                writer.WriteString(euSalgVarerBeloeb.Value.ToString());
-                writer.WriteEndElement();
-            }
-
-            if (eksportOmsaetningBeloeb.HasValue)
-            {
-                writer.WriteStartElement("urn1", "MomsAngivelseEksportOmsaetningBeloeb", "urn:oio:skat:nemvirksomhed:1.0.0");
-                writer.WriteString(eksportOmsaetningBeloeb.Value.ToString());
-                writer.WriteEndElement();
-            }
+                writer.WriteElementString("urn1", "MomsAngivelseSalgsMomsBeloeb", nsUrn1, salgsMomsBeloeb.Value.ToString());
 
             writer.WriteEndElement(); // Angivelsesafgifter
             writer.WriteEndElement(); // Angivelse

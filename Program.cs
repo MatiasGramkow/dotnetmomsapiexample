@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using System;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace UFSTWSSecuritySample
@@ -52,26 +53,29 @@ namespace UFSTWSSecuritySample
                     Console.WriteLine("Finished");
                     break;
                 case "ModtagMomsangivelseForeloebig":
-                    // Kræver TransaktionIdentifikator fra VirksomhedKalenderHent response
-                    if (args.Length < 2)
-                    {
-                        Console.WriteLine("Fejl: TransaktionIdentifikator mangler!");
-                        Console.WriteLine("Brug: dotnet run ModtagMomsangivelseForeloebig <transaktionId>");
-                        Console.WriteLine("Hent først transaktionId fra: dotnet run VirksomhedKalenderHent");
-                        break;
-                    }
-                    var kalenderTransaktionId = args[1];
-                    // Test momsangivelse for Q1 2026 (current quarter)
+                    // Direkte momsangivelse - Q3 2025
                     // afgiftTilsvar = salgsMoms - koebsMoms = 2000 - 500 = 1500
                     await client.CallService(new ModtagMomsangivelseForeloebigWriter(
-                        transaktionIdentifikator: kalenderTransaktionId,
                         seNummer: "41250313",
-                        periodeFraDato: "2026-01-01",
-                        periodeTilDato: "2026-03-31",
+                        periodeFraDato: "2025-07-01",
+                        periodeTilDato: "2025-09-30",
                         afgiftTilsvarBeloeb: 1500,
                         salgsMomsBeloeb: 2000,
                         koebsMomsBeloeb: 500
-                    ), endpoints.ModtagMomsangivelseForeloebig);
+                    ), endpoints.ModtagMomsangivelseForeloebig, "getModtagMomsangivelseForeloebig");
+                    Console.WriteLine("Finished");
+                    break;
+                case "IndsendMomsangivelse":
+                    // Direkte indsendelse - hver request genererer sin egen TransaktionIdentifikator
+                    Console.WriteLine("=== Indsender momsangivelse for Q4 2025 ===");
+                    await client.CallService(new ModtagMomsangivelseForeloebigWriter(
+                        seNummer: "41250313",
+                        periodeFraDato: "2025-10-01",
+                        periodeTilDato: "2025-12-31",
+                        afgiftTilsvarBeloeb: 1500,  // SalgsMoms - KøbsMoms = 2000 - 500
+                        salgsMomsBeloeb: 2000,
+                        koebsMomsBeloeb: 500
+                    ), endpoints.ModtagMomsangivelseForeloebig, "getModtagMomsangivelseForeloebig");
                     Console.WriteLine("Finished");
                     break;
                 case "MomsangivelseKvitteringHent":
@@ -87,6 +91,7 @@ namespace UFSTWSSecuritySample
                 default:
                     Console.WriteLine("Invalid command");
                     Console.WriteLine("Brug:");
+                    Console.WriteLine("  dotnet run IndsendMomsangivelse                  <- Anbefalet: Kører begge kald automatisk");
                     Console.WriteLine("  dotnet run VirksomhedKalenderHent");
                     Console.WriteLine("  dotnet run ModtagMomsangivelseForeloebig <transaktionId fra VirksomhedKalenderHent>");
                     Console.WriteLine("  dotnet run MomsangivelseKvitteringHent <transaktionId fra ModtagMomsangivelseForeloebig>");
