@@ -70,8 +70,8 @@ namespace UFSTWSSecuritySample
                     Console.WriteLine("=== Indsender momsangivelse for Q4 2025 ===");
                     await client.CallService(new ModtagMomsangivelseForeloebigWriter(
                         seNummer: "41250313",
-                        periodeFraDato: "2025-10-01",
-                        periodeTilDato: "2025-12-31",
+                        periodeFraDato: "2024-07-01",
+                        periodeTilDato: "2024-09-30",
                         afgiftTilsvarBeloeb: 1500,  // SalgsMoms - KøbsMoms = 2000 - 500
                         salgsMomsBeloeb: 2000,
                         koebsMomsBeloeb: 500
