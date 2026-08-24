@@ -14,6 +14,31 @@
 > B2B webservicene ved at bruge virksomhedens digitale signatur. UFST kan ikke stå til ansvar hvis en virksomhed
 > anvender klienten eller dele af denne i deres egne systemer. 
 
+## Kom godt i gang (dansk vejledning)
+
+Er du ikke udvikler? Åbn **[GUIDE.html](GUIDE.html)** i en browser — trin-for-trin fra tom maskine
+til svar fra SKAT.
+
+Kort version:
+
+```
+$ git clone https://github.com/MatiasGramkow/dotnetmomsapiexample.git
+$ cd dotnetmomsapiexample
+$ dotnet build
+$ dotnet run VirksomhedKalenderHent
+```
+
+Kaldet er lykkedes når outputtet slutter med:
+
+```
+Signature verified: True
+Certificate trusted: True
+Finished
+```
+
+Kræver .NET 8 SDK. Certifikat og opsætning ligger med i repoet, så der er ikke noget at indtaste.
+Firmasignaturen (`LucaPacioli_ApS_System_Integrationstest_S1.p12`) udløber **30-10-2026**.
+
 ## Build and run
 
 First build:

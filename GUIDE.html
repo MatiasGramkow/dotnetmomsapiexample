@@ -1,0 +1,717 @@
+<title>Kør momsklienten</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=JetBrains+Mono:wght@400;600&display=swap">
+
+<style>
+  :root {
+    --bg: #f6f7f4;
+    --surface: #ffffff;
+    --surface-2: #ecefe9;
+    --border: #d7dcd3;
+    --border-strong: #b9c1b6;
+    --text: #1a2129;
+    --text-dim: #5b666e;
+    --accent: #0f6b5c;
+    --accent-soft: #e3efeb;
+    --ok: #2f6b3a;
+    --ok-soft: #e6f0e5;
+    --warn: #8a5a15;
+    --warn-soft: #f7eeda;
+    --danger: #97302f;
+    --danger-soft: #f8e8e6;
+    --code-bg: #1b242e;
+    --code-text: #dde5ea;
+    --code-dim: #8b9aa6;
+
+    --font-display: "Schibsted Grotesk", "Helvetica Neue", Arial, sans-serif;
+    --font-body: "Source Serif 4", Georgia, "Times New Roman", serif;
+    --font-mono: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #11161a;
+      --surface: #1a2126;
+      --surface-2: #222b31;
+      --border: #2f393f;
+      --border-strong: #46535a;
+      --text: #e7ebe8;
+      --text-dim: #98a4a7;
+      --accent: #4ec0a6;
+      --accent-soft: #1a2e2a;
+      --ok: #74c384;
+      --ok-soft: #1a2a1e;
+      --warn: #d5a355;
+      --warn-soft: #2c2517;
+      --danger: #e2786f;
+      --danger-soft: #2e1d1c;
+      --code-bg: #0c1115;
+      --code-text: #dde5ea;
+      --code-dim: #7d8b96;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --bg: #11161a;
+    --surface: #1a2126;
+    --surface-2: #222b31;
+    --border: #2f393f;
+    --border-strong: #46535a;
+    --text: #e7ebe8;
+    --text-dim: #98a4a7;
+    --accent: #4ec0a6;
+    --accent-soft: #1a2e2a;
+    --ok: #74c384;
+    --ok-soft: #1a2a1e;
+    --warn: #d5a355;
+    --warn-soft: #2c2517;
+    --danger: #e2786f;
+    --danger-soft: #2e1d1c;
+    --code-bg: #0c1115;
+    --code-text: #dde5ea;
+    --code-dim: #7d8b96;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 17px;
+    line-height: 1.65;
+    margin: 0;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 0 24px 96px;
+  }
+
+  /* ---------- header ---------- */
+
+  header.masthead {
+    padding: 72px 0 40px;
+    border-bottom: 2px solid var(--border-strong);
+    margin-bottom: 48px;
+  }
+
+  .eyebrow {
+    font-family: var(--font-display);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0 0 20px;
+  }
+
+  h1 {
+    font-family: var(--font-display);
+    font-size: clamp(38px, 7vw, 60px);
+    font-weight: 700;
+    line-height: 1.02;
+    letter-spacing: -0.025em;
+    text-wrap: balance;
+    margin: 0 0 20px;
+  }
+
+  .standfirst {
+    font-size: 20px;
+    line-height: 1.55;
+    color: var(--text-dim);
+    margin: 0;
+    max-width: 60ch;
+  }
+
+  /* ---------- sections ---------- */
+
+  section { margin-bottom: 56px; }
+
+  h2 {
+    font-family: var(--font-display);
+    font-size: 27px;
+    font-weight: 600;
+    letter-spacing: -0.015em;
+    line-height: 1.2;
+    text-wrap: balance;
+    margin: 0 0 8px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  h3 {
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: -0.005em;
+    margin: 32px 0 6px;
+  }
+
+  p { margin: 14px 0; max-width: 66ch; }
+
+  a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+  a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 2px; }
+
+  strong { font-weight: 600; }
+
+  code {
+    font-family: var(--font-mono);
+    font-size: 0.86em;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 0.1em 0.34em;
+    word-break: break-word;
+  }
+
+  ul, ol { max-width: 66ch; padding-left: 22px; }
+  li { margin: 8px 0; }
+
+  /* ---------- callouts ---------- */
+
+  .note {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 14px;
+    align-items: start;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--border-strong);
+    border-radius: 3px;
+    padding: 18px 20px;
+    margin: 24px 0;
+  }
+  .note p { margin: 6px 0 0; max-width: none; }
+  .note p:first-of-type { margin-top: 0; }
+  .note .tag {
+    font-family: var(--font-display);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding-top: 4px;
+    white-space: nowrap;
+  }
+  .note.warn { border-left-color: var(--warn); background: var(--warn-soft); }
+  .note.warn .tag { color: var(--warn); }
+  .note.danger { border-left-color: var(--danger); background: var(--danger-soft); }
+  .note.danger .tag { color: var(--danger); }
+  .note.info { border-left-color: var(--accent); background: var(--accent-soft); }
+  .note.info .tag { color: var(--accent); }
+
+  /* ---------- code blocks ---------- */
+
+  .cmd, .out {
+    background: var(--code-bg);
+    border-radius: 6px;
+    margin: 18px 0;
+    overflow: hidden;
+    border: 1px solid transparent;
+  }
+
+  .cmd-label {
+    font-family: var(--font-display);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--code-dim);
+    padding: 10px 16px 0;
+  }
+
+  .cmd pre, .out pre {
+    font-family: var(--font-mono);
+    font-size: 13.5px;
+    line-height: 1.7;
+    color: var(--code-text);
+    margin: 0;
+    padding: 12px 16px 16px;
+    overflow-x: auto;
+  }
+
+  .cmd pre .p { color: var(--code-dim); user-select: none; }
+  .cmd pre .c { color: #7f9c8f; }
+  .out pre .ok { color: #7fd39a; font-weight: 600; }
+  .out pre .bad { color: #ef8a80; font-weight: 600; }
+  .out pre .dim { color: var(--code-dim); }
+
+  /* ---------- steps ---------- */
+
+  .step {
+    display: grid;
+    grid-template-columns: 44px 1fr;
+    gap: 20px;
+    padding: 32px 0;
+    border-top: 1px solid var(--border);
+  }
+  .step:first-of-type { border-top: none; padding-top: 12px; }
+
+  .step-num {
+    font-family: var(--font-display);
+    font-size: 15px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: var(--accent);
+    background: var(--accent-soft);
+    border-radius: 50%;
+    width: 34px;
+    height: 34px;
+    display: grid;
+    place-items: center;
+    margin-top: 2px;
+  }
+
+  .step-body > :first-child { margin-top: 0; }
+  .step-body h3 { margin-top: 0; }
+  .step-body { min-width: 0; }
+
+  @media (max-width: 560px) {
+    .step { grid-template-columns: 1fr; gap: 12px; }
+  }
+
+  /* ---------- chain (how it works) ---------- */
+
+  .chain {
+    list-style: none;
+    padding: 0;
+    margin: 24px 0;
+    counter-reset: chain;
+  }
+  .chain li {
+    position: relative;
+    padding: 0 0 22px 40px;
+    margin: 0;
+    counter-increment: chain;
+  }
+  .chain li::before {
+    content: counter(chain);
+    position: absolute;
+    left: 0;
+    top: 2px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--surface);
+    border: 1.5px solid var(--border-strong);
+    color: var(--text-dim);
+    font-family: var(--font-display);
+    font-size: 12px;
+    font-weight: 600;
+    display: grid;
+    place-items: center;
+  }
+  .chain li:not(:last-child)::after {
+    content: "";
+    position: absolute;
+    left: 11.5px;
+    top: 28px;
+    bottom: 2px;
+    width: 1.5px;
+    background: var(--border);
+  }
+  .chain .what {
+    font-family: var(--font-display);
+    font-weight: 600;
+    display: block;
+  }
+  .chain .why { color: var(--text-dim); font-size: 15.5px; }
+
+  /* ---------- tables ---------- */
+
+  .table-scroll { overflow-x: auto; margin: 22px 0; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 15.5px;
+    min-width: 520px;
+  }
+  th {
+    font-family: var(--font-display);
+    font-size: 11.5px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-align: left;
+    color: var(--text-dim);
+    padding: 0 14px 10px 0;
+    border-bottom: 1.5px solid var(--border-strong);
+  }
+  td {
+    padding: 13px 14px 13px 0;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  td:last-child, th:last-child { padding-right: 0; }
+  table code { font-size: 0.82em; }
+
+  .pill {
+    display: inline-block;
+    font-family: var(--font-display);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 3px 9px;
+    border-radius: 3px;
+    white-space: nowrap;
+  }
+  .pill.safe { background: var(--ok-soft); color: var(--ok); }
+  .pill.writes { background: var(--warn-soft); color: var(--warn); }
+
+  /* ---------- facts ---------- */
+
+  .facts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    margin: 26px 0;
+    overflow: hidden;
+  }
+  .fact { background: var(--surface); padding: 16px 18px; }
+  .fact dt {
+    font-family: var(--font-display);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 5px;
+  }
+  .fact dd {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 17px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+  .fact dd.good { color: var(--ok); }
+  .fact dd.attention { color: var(--warn); }
+
+  footer {
+    border-top: 1px solid var(--border);
+    padding-top: 24px;
+    color: var(--text-dim);
+    font-size: 14.5px;
+  }
+  footer p { max-width: 66ch; }
+</style>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <p class="eyebrow">SKAT B2B · Testmiljø</p>
+    <h1>Kør momsklienten</h1>
+    <p class="standfirst">Et lille program der sender en momsangivelse til SKAT med vores digitale
+      firmasignatur. Her er alt hvad du skal gøre for at køre det — fra tom maskine til svar fra SKAT.</p>
+  </header>
+
+  <section>
+    <h2>Hvad er det her egentlig?</h2>
+    <p>SKAT har en maskine-til-maskine-indgang, hvor et regnskabsprogram kan indberette moms direkte
+      uden at nogen skal sidde og tappe tal ind på skat.dk. For at få lov skal beskeden være
+      <strong>underskrevet digitalt</strong> med virksomhedens signatur — nogenlunde som en
+      underskrift på et papir, bare regnet ud med matematik.</p>
+    <p>Programmet her er den underskrift-maskine. Det gør fem ting:</p>
+
+    <ol class="chain">
+      <li>
+        <span class="what">Læser certifikatet</span>
+        <span class="why">Filen <code>…_S1.p12</code> indeholder virksomhedens digitale signatur og
+          den hemmelige nøgle der hører til.</span>
+      </li>
+      <li>
+        <span class="what">Bygger beskeden</span>
+        <span class="why">En SOAP-besked — en meget formel form for XML som SKATs systemer forstår.</span>
+      </li>
+      <li>
+        <span class="what">Underskriver den</span>
+        <span class="why">Signaturen lægges ind i beskeden, så SKAT kan se at den kommer fra os og
+          ikke er ændret undervejs.</span>
+      </li>
+      <li>
+        <span class="what">Sender til SKAT</span>
+        <span class="why">Over en krypteret forbindelse til <code>emcstest.skat.dk</code> — testmiljøet,
+          ikke det rigtige.</span>
+      </li>
+      <li>
+        <span class="what">Tjekker svaret</span>
+        <span class="why">SKAT underskriver også <em>sit</em> svar. Programmet kontrollerer den
+          underskrift mod filen <code>server.pem</code>, så vi ved vi har talt med SKAT og ikke en
+          bedrager.</span>
+      </li>
+    </ol>
+
+    <div class="note info">
+      <span class="tag">Bemærk</span>
+      <div>
+        <p>Alt peger på SKATs <strong>testmiljø</strong>. Ingenting du gør her rammer den rigtige
+          momsopgørelse eller koster penge. Det er en øvebane.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Certifikatets tilstand</h2>
+    <p>Kontrolleret den 24. august 2026 med et rigtigt kald til SKATs testmiljø:</p>
+
+    <div class="facts">
+      <dl class="fact">
+        <dt>Firmasignatur</dt>
+        <dd class="good">Virker</dd>
+      </dl>
+      <dl class="fact">
+        <dt>Udløber</dt>
+        <dd class="attention">30-10-2026</dd>
+      </dl>
+      <dl class="fact">
+        <dt>Spærret?</dt>
+        <dd class="good">Nej</dd>
+      </dl>
+      <dl class="fact">
+        <dt>SKATs eget certifikat</dt>
+        <dd>Fornyet marts 2026</dd>
+      </dl>
+    </div>
+
+    <p>Signaturen holder altså — men kun til <strong>30. oktober 2026</strong>. Derefter afviser SKAT
+      beskederne, og der skal bestilles et nyt certifikat. Sæt et kryds i kalenderen i god tid.</p>
+  </section>
+
+  <section>
+    <h2>Før du starter</h2>
+    <p>Du skal have to ting installeret. Begge er gratis, og begge tager et par minutter.</p>
+
+    <h3>1 · .NET 8</h3>
+    <p>Selve motoren programmet kører på. Hent <strong>.NET 8 SDK</strong> fra Microsoft:
+      <a href="https://dotnet.microsoft.com/download/dotnet/8.0">dotnet.microsoft.com/download/dotnet/8.0</a>.
+      Vælg installationsprogrammet til din maskine — Mac eller Windows — og klik igennem.</p>
+
+    <h3>2 · Git</h3>
+    <p>Værktøjet der henter koden ned. På Mac får du det ved at åbne <strong>Terminal</strong> og
+      skrive <code>git --version</code>; mangler det, tilbyder Mac selv at installere det. På Windows
+      hentes det fra <a href="https://git-scm.com/download/win">git-scm.com</a>.</p>
+
+    <h3>Sådan åbner du et terminalvindue</h3>
+    <p>Alle kommandoer herunder skrives i et terminalvindue — et tekstfelt hvor man skriver
+      kommandoer i stedet for at klikke.</p>
+    <ul>
+      <li><strong>Mac:</strong> tryk <code>⌘ + mellemrum</code>, skriv <em>Terminal</em>, tryk retur.</li>
+      <li><strong>Windows:</strong> tryk Start, skriv <em>PowerShell</em>, tryk retur.</li>
+    </ul>
+    <p>Du skriver én linje ad gangen og trykker retur efter hver. Tegnet <code>%</code> herunder er
+      bare terminalens egen markering — det skal du <em>ikke</em> skrive selv.</p>
+  </section>
+
+  <section>
+    <h2>Kør programmet</h2>
+
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <h3>Hent koden ned</h3>
+        <p>Denne kommando laver en mappe med programmet i og hopper ind i den.</p>
+        <div class="cmd">
+          <div class="cmd-label">Skriv dette</div>
+          <pre><span class="p">% </span>git clone https://github.com/MatiasGramkow/dotnetmomsapiexample.git
+<span class="p">% </span>cd dotnetmomsapiexample</pre>
+        </div>
+        <p>Du skal kun gøre dette <em>én</em> gang. Næste gang åbner du blot terminalen og skriver
+          <code>cd dotnetmomsapiexample</code> igen.</p>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <h3>Byg det</h3>
+        <p>Her oversættes koden til noget maskinen kan køre. Første gang tager det op mod et minut,
+          fordi den også henter en række hjælpebiblioteker.</p>
+        <div class="cmd">
+          <div class="cmd-label">Skriv dette</div>
+          <pre><span class="p">% </span>dotnet build</pre>
+        </div>
+        <div class="out">
+          <div class="cmd-label">Det skal ende med</div>
+          <pre><span class="ok">Build succeeded.</span>
+<span class="dim">    0 Warning(s)
+    0 Error(s)</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <h3>Send det første kald</h3>
+        <p>Start med <code>VirksomhedKalenderHent</code>. Den <em>henter</em> kun oplysninger — den
+          spørger SKAT hvornår virksomhedens momsfrister ligger. Der bliver ikke indsendt noget,
+          så den er helt ufarlig at prøve.</p>
+        <div class="cmd">
+          <div class="cmd-label">Skriv dette</div>
+          <pre><span class="p">% </span>dotnet run VirksomhedKalenderHent</pre>
+        </div>
+        <p>Der spytter en <em>meget</em> lang mur af XML ud på skærmen. Det er helt normalt — det er
+          beskeden ud og svaret ind. Det interessante er de tre sidste linjer.</p>
+        <div class="out">
+          <div class="cmd-label">Det skal slutte med</div>
+          <pre>Signature verified: <span class="ok">True</span>
+Certificate trusted: <span class="ok">True</span>
+<span class="ok">Finished</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <h3>Læs de tre linjer</h3>
+        <p>Det er dem der fortæller om det gik godt:</p>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr><th>Linje</th><th>Betyder</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>Signature verified: True</code></td>
+                <td>Svaret fra SKAT er ægte og uændret undervejs.</td>
+              </tr>
+              <tr>
+                <td><code>Certificate trusted: True</code></td>
+                <td>Det er SKATs eget certifikat der har underskrevet — ikke en fremmed.</td>
+              </tr>
+              <tr>
+                <td><code>Finished</code></td>
+                <td>Programmet kørte færdigt uden at gå ned.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p>Står der <code>True</code> to gange og <code>Finished</code> til sidst, virker hele kæden —
+          signatur, forbindelse og certifikat.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>De øvrige kommandoer</h2>
+    <p>Programmet kan fire ting. De skrives alle på samme måde: <code>dotnet run</code> efterfulgt af
+      navnet.</p>
+
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr><th>Kommando</th><th></th><th>Hvad den gør</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>VirksomhedKalenderHent</code></td>
+            <td><span class="pill safe">Henter kun</span></td>
+            <td>Spørger om virksomhedens momsfrister. Start altid her.</td>
+          </tr>
+          <tr>
+            <td><code>MomsangivelseKvitteringHent</code></td>
+            <td><span class="pill safe">Henter kun</span></td>
+            <td>Henter kvitteringen for en tidligere indsendt angivelse. Kræver et
+              transaktions-id bagefter.</td>
+          </tr>
+          <tr>
+            <td><code>ModtagMomsangivelseForeloebig</code></td>
+            <td><span class="pill writes">Indsender</span></td>
+            <td>Indsender en momsangivelse i testmiljøet.</td>
+          </tr>
+          <tr>
+            <td><code>IndsendMomsangivelse</code></td>
+            <td><span class="pill writes">Indsender</span></td>
+            <td>Samme som ovenstående, med en anden periode.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="note warn">
+      <span class="tag">Pas på</span>
+      <div>
+        <p>De to nederste <strong>indsender</strong> en momsangivelse. Tallene er faste og skrevet
+          ind i koden — 2.000 kr. salgsmoms, 500 kr. købsmoms — og det hele foregår i testmiljøet, så
+          det rammer ikke virkeligheden. Men de to skal ikke bruges til at eksperimentere med, før
+          nogen har set på tallene. Ring til Matias først.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Hvis det ikke virker</h2>
+
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr><th>Det du ser</th><th>Sådan retter du det</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>Certificate trusted: False</code></td>
+            <td>SKAT har fornyet sit certifikat, og filen <code>server.pem</code> i mappen er den
+              gamle. Selve indsendelsen virker stadig — det er kun kontrollen af svaret der fejler.
+              Kræver en ny <code>server.pem</code>. Sig til.</td>
+          </tr>
+          <tr>
+            <td><code>command not found: dotnet</code></td>
+            <td>.NET er ikke installeret, eller terminalen skal genstartes. Luk vinduet, åbn et nyt
+              og prøv igen.</td>
+          </tr>
+          <tr>
+            <td><code>Cannot find …S1.p12</code></td>
+            <td>Du står i den forkerte mappe. Skriv <code>cd dotnetmomsapiexample</code> og prøv igen.</td>
+          </tr>
+          <tr>
+            <td><code>Invalid command</code></td>
+            <td>Kommandonavnet er stavet forkert. Der er forskel på store og små bogstaver.</td>
+          </tr>
+          <tr>
+            <td>Fejl om udløbet certifikat</td>
+            <td>Tjek datoen. Firmasignaturen udløber 30-10-2026, og derefter skal der bestilles en ny.</td>
+          </tr>
+          <tr>
+            <td>Programmet hænger</td>
+            <td>Tryk <code>Ctrl + C</code> for at afbryde. Tjek internetforbindelsen og prøv igen —
+              SKATs testmiljø er også nede en gang i mellem.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2>Godt at vide</h2>
+
+    <h3>Certifikatet ligger i mappen</h3>
+    <p>Både signaturen og adgangskoden til den ligger direkte i den kode du henter ned. Praktisk,
+      fordi der ikke er noget at indtaste — men det betyder også at <strong>enhver der får fat i
+      mappen kan underskrive i virksomhedens navn</strong>. Del den ikke, og læg den ikke på et
+      USB-stik eller i en mail.</p>
+
+    <h3>Det er kun testmiljøet</h3>
+    <p>Adresserne i opsætningen peger alle på <code>emcstest.skat.dk</code>. Skal der en dag
+      indberettes for rigtigt, er det andre adresser og et andet certifikat — det er ikke noget der
+      sker ved et uheld.</p>
+
+    <h3>Du kan ikke ødelægge noget</h3>
+    <p>Går det galt, kan mappen slettes og hentes forfra med kommandoen i trin 1. Der er ingen
+      indstillinger at rode med.</p>
+  </section>
+
+  <footer>
+    <p>Kontrolleret og afprøvet mod SKATs testmiljø den 24. august 2026. Spørgsmål til
+      <a href="mailto:magr@edc.dk">magr@edc.dk</a>.</p>
+  </footer>
+
+</div>
